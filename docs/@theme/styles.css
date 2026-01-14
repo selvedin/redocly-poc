@@ -1,0 +1,59 @@
+/* Light mode styling (default) */
+:root {
+  /* Brand colors */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  
+  /* Layout colors */
+  --navbar-bg-color: #ffffff;
+  --sidebar-background-color: #f8fafc;
+  --content-background-color: #ffffff;
+  
+  /* Typography */
+  --h1-text-color: #1f2937;
+  --text-color: #374151;
+  --link-text-color: #2563eb;
+  
+  /* Spacing and borders */
+  --border-color: #e5e7eb;
+}
+
+:root.light {
+  --sidebar-background-color: #ffffff;
+  --sidebar-active-background-color: var(--color-purple-2);
+  --text-color: #374151;
+  --navbar-background-color: #ffffff;
+}
+
+/* Dark mode styling */
+:root.dark {
+  /* Brand colors for dark mode */
+  --color-primary: #60a5fa;
+  --color-primary-hover: #3b82f6;
+  
+  /* Layout colors */
+  --navbar-bg-color: #0f172a;
+  --sidebar-background-color: #1e293b;
+  --content-background-color: #0f172a;
+  
+  /* Typography */
+  --h1-text-color: #f1f5f9;
+  --text-color: #cbd5e1;
+  --link-text-color: #60a5fa;
+  
+  /* Spacing and borders */
+  --border-color: #374151;
+}
+
+/* Custom font configuration */
+@font-face {
+  font-family: 'CustomBrand';
+  src: url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --font-family-headings: 'CustomBrand', system-ui, sans-serif;
+  --font-family-body: 'Inter', system-ui, sans-serif;
+}

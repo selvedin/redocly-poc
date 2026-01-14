@@ -1,0 +1,5 @@
+extends:
+  - recommended
+seo:
+  title: Example Developer Portal
+  description: Learn how to work with Example APIs

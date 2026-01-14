@@ -1,0 +1,10 @@
+products:
+  tickets:
+    name: Museum Tickets
+    icon: images/ticket-logo.png
+    folder: products/tickets/
+  events:
+    name: Museum Events
+    icon: ./images/event-logo.svg
+    folder: ./products/events
+navbar:
