@@ -1,181 +1,806 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
-  title: Simple API overview
-  version: 2.0.0
+  title: Payments Gateway API
+  version: 1.0.0
+  description: |
+    A simple Payments Gateway API for creating payments, querying status, issuing refunds,
+    and receiving asynchronous webhook events.
+  termsOfService: https://selvedin.payments.com/terms
+  contact:
+    name: API Support
+    email: support@selvedin.com
+    url: https://example.payments.com/support
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
 servers:
-  - url: http://127.0.0.1:8774
-    description: Local dev
+  - url: https://api.payments.selvedin.com/v1
+    description: Production
+  - url: https://sandbox.payments.selvedin.com/v1
+    description: Sandbox
+
+tags:
+  - name: Payments
+    description: Create and manage payments
+  - name: Refunds
+    description: Create and manage refunds
+  - name: Webhooks
+    description: Manage webhook endpoints and events
+
+security:
+  - ApiKeyAuth: []
+
 paths:
-  /:
-    get:
-      operationId: listVersionsv2
-      summary: List API versions
+  /payments:
+    post:
+      tags: [Payments]
+      operationId: createPayment
+      summary: Create a payment
+      description: Creates a payment intent and returns its status.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+            examples:
+              cardPayment:
+                value:
+                  amount: 1999
+                  currency: EUR
+                  merchantReference: ORDER-10001
+                  paymentMethod:
+                    type: card
+                    card:
+                      token: tok_test_visa_123
+                  customer:
+                    id: cus_abc123
+                    email: customer@selvedin.com
+                  returnUrl: https://merchant.selvedin.com/checkout/return
       responses:
-        '200':
-          description: 200 response
+        "201":
+          description: Payment created
+          headers:
+            Location:
+              description: URL of the created payment resource
+              schema:
+                type: string
+              example: /payments/pay_123
           content:
             application/json:
-              examples:
-                foo:
-                  value:
-                    {
-                      "versions":
-                        [
-                          {
-                            "status": "CURRENT",
-                            "updated": "2011-01-21T11:33:21Z",
-                            "id": "v2.0",
-                            "links":
-                              [
-                                {
-                                  "href": "http://127.0.0.1:8774/v2/",
-                                  "rel": "self"
-                                }
-                              ]
-                          },
-                          {
-                            "status": "EXPERIMENTAL",
-                            "updated": "2013-07-23T11:33:21Z",
-                            "id": "v3.0",
-                            "links":
-                              [
-                                {
-                                  "href": "http://127.0.0.1:8774/v3/",
-                                  "rel": "self"
-                                }
-                              ]
-                          }
-                        ]
-                    }
-        '300':
-          description: 300 response
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          description: Invalid request
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
               examples:
-                foo:
+                badRequest:
                   value:
-                    {
-                      "versions":
-                        [
-                          {
-                            "status": "CURRENT",
-                            "updated": "2011-01-21T11:33:21Z",
-                            "id": "v2.0",
-                            "links":
-                              [
-                                {
-                                  "href": "http://127.0.0.1:8774/v2/",
-                                  "rel": "self"
-                                }
-                              ]
-                          },
-                          {
-                            "status": "EXPERIMENTAL",
-                            "updated": "2013-07-23T11:33:21Z",
-                            "id": "v3.0",
-                            "links":
-                              [
-                                {
-                                  "href": "http://127.0.0.1:8774/v3/",
-                                  "rel": "self"
-                                }
-                              ]
-                          }
-                        ]
-                    }
-  /v2:
+                    code: invalid_request
+                    message: Amount must be greater than 0.
+                    requestId: req_001
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Request is syntactically valid but cannot be processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                validationError:
+                  value:
+                    code: validation_error
+                    message: currency must be a valid ISO-4217 code.
+                    requestId: req_002
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
     get:
-      operationId: getVersionDetailsv2
-      summary: Show API version details
+      tags: [Payments]
+      operationId: listPayments
+      summary: List payments
+      description: Returns a paginated list of payments.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of items to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: startingAfter
+          in: query
+          description: Cursor for pagination (return items after this ID)
+          required: false
+          schema:
+            type: string
       responses:
         "200":
-          description: 200 response
+          description: List of payments
           content:
             application/json:
-              examples:
-                foo:
-                  value:
-                    {
-                      "version":
-                        {
-                          "status": "CURRENT",
-                          "updated": "2011-01-21T11:33:21Z",
-                          "media-types":
-                            [
-                              {
-                                "base": "application/xml",
-                                "type": "application/vnd.openstack.compute+xml;version=2"
-                              },
-                              {
-                                "base": "application/json",
-                                "type": "application/vnd.openstack.compute+json;version=2"
-                              }
-                            ],
-                          "id": "v2.0",
-                          "links":
-                            [
-                              {
-                                "href": "http://127.0.0.1:8774/v2/",
-                                "rel": "self"
-                              },
-                              {
-                                "href": "http://docs.openstack.org/api/openstack-compute/2/os-compute-devguide-2.pdf",
-                                "type": "application/pdf",
-                                "rel": "describedby"
-                              },
-                              {
-                                "href": "http://docs.openstack.org/api/openstack-compute/2/wadl/os-compute-2.wadl",
-                                "type": "application/vnd.sun.wadl+xml",
-                                "rel": "describedby"
-                              },
-                              {
-                                "href": "http://docs.openstack.org/api/openstack-compute/2/wadl/os-compute-2.wadl",
-                                "type": "application/vnd.sun.wadl+xml",
-                                "rel": "describedby"
-                              }
-                            ]
-                        }
-                    }
-        '203':
-          description: 203 response
+              schema:
+                $ref: "#/components/schemas/PaymentList"
+        "400":
+          description: Invalid query parameter(s)
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /payments/{paymentId}:
+    get:
+      tags: [Payments]
+      operationId: getPayment
+      summary: Get payment details
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Payment identifier (e.g., pay_123)
+      responses:
+        "200":
+          description: Payment found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          description: Invalid paymentId format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /payments/{paymentId}/capture:
+    post:
+      tags: [Payments]
+      operationId: capturePayment
+      summary: Capture an authorized payment
+      description: Captures a payment that is in `authorized` status.
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CapturePaymentRequest"
+            examples:
+              partialCapture:
+                value:
+                  amount: 999
+      responses:
+        "200":
+          description: Payment captured (or updated)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          description: Invalid request (e.g., amount too high)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Payment is not in a capturable state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
               examples:
-                foo:
+                conflict:
                   value:
-                    {
-                      "version":
-                        {
-                          "status": "CURRENT",
-                          "updated": "2011-01-21T11:33:21Z",
-                          "media-types":
-                            [
-                              {
-                                "base": "application/xml",
-                                "type": "application/vnd.openstack.compute+xml;version=2"
-                              },
-                              {
-                                "base": "application/json",
-                                "type": "application/vnd.openstack.compute+json;version=2"
-                              }
-                            ],
-                          "id": "v2.0",
-                          "links":
-                            [
-                              {
-                                "href": "http://23.253.228.211:8774/v2/",
-                                "rel": "self"
-                              },
-                              {
-                                "href": "http://docs.openstack.org/api/openstack-compute/2/os-compute-devguide-2.pdf",
-                                "type": "application/pdf",
-                                "rel": "describedby"
-                              },
-                              {
-                                "href": "http://docs.openstack.org/api/openstack-compute/2/wadl/os-compute-2.wadl",
-                                "type": "application/vnd.sun.wadl+xml",
-                                "rel": "describedby"
-                              }
-                            ]
-                        }
-                    }
+                    code: conflict
+                    message: Payment must be authorized to capture.
+                    requestId: req_003
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /refunds:
+    post:
+      tags: [Refunds]
+      operationId: createRefund
+      summary: Create a refund
+      description: Issues a refund for a captured payment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRefundRequest"
+            examples:
+              fullRefund:
+                value:
+                  paymentId: pay_123
+                  amount: 1999
+                  reason: requested_by_customer
+      responses:
+        "201":
+          description: Refund created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Refund cannot be created (e.g., insufficient captured amount)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    get:
+      tags: [Refunds]
+      operationId: listRefunds
+      summary: List refunds
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: paymentId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter refunds by paymentId
+      responses:
+        "200":
+          description: List of refunds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefundList"
+        "400":
+          description: Invalid query parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /webhooks/endpoints:
+    post:
+      tags: [Webhooks]
+      operationId: createWebhookEndpoint
+      summary: Create a webhook endpoint
+      description: Registers a webhook endpoint to receive events.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWebhookEndpointRequest"
+            examples:
+              endpoint:
+                value:
+                  url: https://merchant.selvedin.com/webhooks/payments
+                  events:
+                    - payment.succeeded
+                    - payment.failed
+                    - refund.created
+      responses:
+        "201":
+          description: Webhook endpoint created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookEndpoint"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation error (e.g., invalid URL)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /webhooks/events:
+    post:
+      tags: [Webhooks]
+      operationId: receiveWebhookEvent
+      summary: Receive webhook event (for consumers)
+      description: |
+        This endpoint describes how your service should receive events from the gateway.
+        It is typically implemented by the merchant, not called with an API key.
+      security: [] # explicitly no auth for webhook receiver examples
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookEvent"
+            examples:
+              paymentSucceeded:
+                value:
+                  id: evt_001
+                  type: payment.succeeded
+                  createdAt: "2026-01-14T10:20:30Z"
+                  data:
+                    payment:
+                      id: pay_123
+                      status: succeeded
+                      amount: 1999
+                      currency: EUR
+      responses:
+        "200":
+          description: Event accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                required: [received]
+                additionalProperties: false
+              examples:
+                ok:
+                  value:
+                    received: true
+        "400":
+          description: Invalid event payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Provide your API key in the `X-API-Key` header.
+
+  schemas:
+    CreatePaymentRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - amount
+        - currency
+        - merchantReference
+        - paymentMethod
+      properties:
+        amount:
+          type: integer
+          minimum: 1
+          description: Amount in minor units (e.g., cents).
+          example: 1999
+        currency:
+          type: string
+          description: ISO-4217 currency code.
+          minLength: 3
+          maxLength: 3
+          example: EUR
+        merchantReference:
+          type: string
+          description: Merchant order/reference identifier.
+          example: ORDER-10001
+        paymentMethod:
+          $ref: "#/components/schemas/PaymentMethod"
+        customer:
+          $ref: "#/components/schemas/Customer"
+        returnUrl:
+          type: string
+          format: uri
+          description: URL to redirect the customer after an off-site flow (3DS, etc.).
+          example: https://merchant.selvedin.com/checkout/return
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: Free-form key/value metadata.
+
+    CapturePaymentRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        amount:
+          type: integer
+          minimum: 1
+          description: Optional partial capture amount in minor units. If omitted, captures the remaining amount.
+
+    CreateRefundRequest:
+      type: object
+      additionalProperties: false
+      required: [paymentId, amount]
+      properties:
+        paymentId:
+          type: string
+          example: pay_123
+        amount:
+          type: integer
+          minimum: 1
+          example: 1999
+        reason:
+          type: string
+          description: Reason for the refund.
+          enum:
+            - requested_by_customer
+            - duplicate
+            - fraudulent
+            - other
+
+    Payment:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - status
+        - amount
+        - currency
+        - createdAt
+      properties:
+        id:
+          type: string
+          example: pay_123
+        status:
+          type: string
+          enum: [requires_action, authorized, captured, succeeded, failed, canceled]
+          example: succeeded
+        amount:
+          type: integer
+          example: 1999
+        currency:
+          type: string
+          example: EUR
+        capturedAmount:
+          type: integer
+          nullable: true
+          description: Total captured amount in minor units (if any).
+          example: 1999
+        merchantReference:
+          type: string
+          nullable: true
+          example: ORDER-10001
+        paymentMethod:
+          $ref: "#/components/schemas/PaymentMethod"
+        customer:
+          $ref: "#/components/schemas/Customer"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-01-14T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-01-14T10:01:00Z"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          nullable: true
+
+    PaymentList:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Payment"
+        nextCursor:
+          type: string
+          nullable: true
+          description: Use as `startingAfter` to fetch the next page.
+          example: pay_124
+
+    Refund:
+      type: object
+      additionalProperties: false
+      required: [id, paymentId, status, amount, currency, createdAt]
+      properties:
+        id:
+          type: string
+          example: ref_001
+        paymentId:
+          type: string
+          example: pay_123
+        status:
+          type: string
+          enum: [pending, succeeded, failed]
+          example: succeeded
+        amount:
+          type: integer
+          example: 1999
+        currency:
+          type: string
+          example: EUR
+        reason:
+          type: string
+          nullable: true
+          example: requested_by_customer
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-01-14T10:10:00Z"
+
+    RefundList:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Refund"
+        nextCursor:
+          type: string
+          nullable: true
+          example: ref_010
+
+    PaymentMethod:
+      type: object
+      additionalProperties: false
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [card, bank_transfer, wallet]
+        card:
+          $ref: "#/components/schemas/CardMethod"
+        bankTransfer:
+          $ref: "#/components/schemas/BankTransferMethod"
+        wallet:
+          $ref: "#/components/schemas/WalletMethod"
+      description: |
+        Only the matching method object for the selected `type` should be provided.
+
+    CardMethod:
+      type: object
+      additionalProperties: false
+      required: [token]
+      properties:
+        token:
+          type: string
+          description: Tokenized card reference.
+          example: tok_test_visa_123
+
+    BankTransferMethod:
+      type: object
+      additionalProperties: false
+      required: [iban]
+      properties:
+        iban:
+          type: string
+          example: DE89370400440532013000
+
+    WalletMethod:
+      type: object
+      additionalProperties: false
+      required: [provider]
+      properties:
+        provider:
+          type: string
+          enum: [apple_pay, google_pay, paypal]
+          example: paypal
+
+    Customer:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: cus_abc123
+        email:
+          type: string
+          format: email
+          example: customer@selvedin.com
+
+    CreateWebhookEndpointRequest:
+      type: object
+      additionalProperties: false
+      required: [url, events]
+      properties:
+        url:
+          type: string
+          format: uri
+          example: https://merchant.selvedin.com/webhooks/payments
+        events:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/WebhookEventType"
+
+    WebhookEndpoint:
+      type: object
+      additionalProperties: false
+      required: [id, url, events, createdAt]
+      properties:
+        id:
+          type: string
+          example: wh_001
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookEventType"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-01-14T10:30:00Z"
+
+    WebhookEvent:
+      type: object
+      additionalProperties: false
+      required: [id, type, createdAt, data]
+      properties:
+        id:
+          type: string
+          example: evt_001
+        type:
+          $ref: "#/components/schemas/WebhookEventType"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-01-14T10:20:30Z"
+        data:
+          type: object
+          additionalProperties: false
+          required: [payment]
+          properties:
+            payment:
+              $ref: "#/components/schemas/Payment"
+            refund:
+              $ref: "#/components/schemas/Refund"
+
+    WebhookEventType:
+      type: string
+      enum:
+        - payment.requires_action
+        - payment.authorized
+        - payment.captured
+        - payment.succeeded
+        - payment.failed
+        - payment.canceled
+        - refund.created
+        - refund.succeeded
+        - refund.failed
+
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message, requestId]
+      properties:
+        code:
+          type: string
+          example: invalid_request
+        message:
+          type: string
+          example: Something went wrong.
+        requestId:
+          type: string
+          example: req_001
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true

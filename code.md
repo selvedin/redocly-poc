@@ -48,8 +48,8 @@
   {% /tab %}
   {% tab label="Replay Openapi"%}
     {% replay-openapi
-      descriptionFile="./openapi/users.yaml"
-      operationId="getUserByName"
+      descriptionFile="./openapi/payments.yaml"
+      operationId="createPayment"
     /%}
   {% /tab %}
 {% /tabs %}
