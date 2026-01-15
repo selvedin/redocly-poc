@@ -1,0 +1,648 @@
+openapi: 3.0.3
+info:
+  title: Users API
+  version: 1.0.0
+  description: |
+    Users API for managing user accounts, profiles, and credentials.
+    Includes basic CRUD operations, password reset flow, and user activation.
+  termsOfService: https://selvedin.com/terms
+  contact:
+    name: API Support
+    email: support@selvedin.com
+    url: https://selvedin.com/support
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://api.selvedin.com/v1
+    description: Production
+  - url: https://sandbox.api.selvedin.com/v1
+    description: Sandbox
+
+tags:
+  - name: Users
+    description: Create and manage users
+  - name: Auth
+    description: Authentication and credential operations
+
+security:
+  - BearerAuth: []
+
+paths:
+  /users:
+    post:
+      tags: [Users]
+      operationId: createUser
+      summary: Create a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+            examples:
+              basic:
+                value:
+                  email: jane.doe@selvedin.com
+                  password: "P@ssw0rd!123"
+                  profile:
+                    firstName: Jane
+                    lastName: Doe
+      responses:
+        "201":
+          description: User created
+          headers:
+            Location:
+              description: URL of the created user resource
+              schema:
+                type: string
+              example: /users/usr_123
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalid:
+                  value:
+                    code: invalid_request
+                    message: Email is required.
+                    requestId: req_100
+        "401":
+          description: Missing or invalid access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                conflict:
+                  value:
+                    code: conflict
+                    message: A user with that email already exists.
+                    requestId: req_101
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    get:
+      tags: [Users]
+      operationId: listUsers
+      summary: List users
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of users to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: startingAfter
+          in: query
+          description: Cursor for pagination (return items after this user ID)
+          required: false
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: Filter by exact email address
+          required: false
+          schema:
+            type: string
+            format: email
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserList"
+        "400":
+          description: Invalid query parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}:
+    get:
+      tags: [Users]
+      operationId: getUser
+      summary: Get user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User identifier (e.g., usr_123)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid userId format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      tags: [Users]
+      operationId: updateUser
+      summary: Update user profile fields
+      description: Partial update of user profile fields (does not update password).
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+            examples:
+              updateName:
+                value:
+                  profile:
+                    firstName: Janet
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Conflict (e.g., email already in use)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      tags: [Users]
+      operationId: deleteUser
+      summary: Delete a user
+      description: Permanently deletes a user account.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: User deleted
+        "400":
+          description: Invalid userId format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}/password:
+    post:
+      tags: [Auth]
+      operationId: changePassword
+      summary: Change password
+      description: Changes a user's password given the current password.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+            examples:
+              change:
+                value:
+                  currentPassword: "P@ssw0rd!123"
+                  newPassword: "N3wP@ssw0rd!456"
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  changed:
+                    type: boolean
+                required: [changed]
+              examples:
+                ok:
+                  value:
+                    changed: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Current password incorrect
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                forbidden:
+                  value:
+                    code: forbidden
+                    message: Current password is incorrect.
+                    requestId: req_201
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/password-reset:
+    post:
+      tags: [Auth]
+      operationId: requestPasswordReset
+      summary: Request password reset
+      description: Sends a password reset link/token to the user's email.
+      security: [] # public endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordResetRequest"
+            examples:
+              request:
+                value:
+                  email: jane.doe@selvedin.com
+      responses:
+        "202":
+          description: Password reset request accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  accepted:
+                    type: boolean
+                required: [accepted]
+              examples:
+                ok:
+                  value:
+                    accepted: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/password-reset/confirm:
+    post:
+      tags: [Auth]
+      operationId: confirmPasswordReset
+      summary: Confirm password reset
+      description: Confirms a password reset token and sets a new password.
+      security: [] # public endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordResetConfirmRequest"
+            examples:
+              confirm:
+                value:
+                  token: prt_abc123
+                  newPassword: "N3wP@ssw0rd!456"
+      responses:
+        "200":
+          description: Password reset completed
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  reset:
+                    type: boolean
+                required: [reset]
+              examples:
+                ok:
+                  value:
+                    reset: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Token not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Password policy violation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'Use a JWT access token in the `Authorization: Bearer <token>` header.'
+
+  schemas:
+    CreateUserRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: jane.doe@selvedin.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: "P@ssw0rd!123"
+        profile:
+          $ref: "#/components/schemas/UserProfile"
+
+    UpdateUserRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          format: email
+          example: jane.doe@selvedin.com
+        profile:
+          $ref: "#/components/schemas/UserProfile"
+        status:
+          type: string
+          enum: [active, disabled]
+          example: active
+
+    User:
+      type: object
+      additionalProperties: false
+      required: [id, email, status, createdAt]
+      properties:
+        id:
+          type: string
+          example: usr_123
+        email:
+          type: string
+          format: email
+          example: jane.doe@selvedin.com
+        status:
+          type: string
+          enum: [pending, active, disabled]
+          example: active
+        profile:
+          $ref: "#/components/schemas/UserProfile"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-01-14T09:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-01-14T09:30:00Z"
+
+    UserProfile:
+      type: object
+      additionalProperties: false
+      properties:
+        firstName:
+          type: string
+          example: Jane
+        lastName:
+          type: string
+          example: Doe
+        phone:
+          type: string
+          nullable: true
+          example: "+38761123456"
+        locale:
+          type: string
+          nullable: true
+          example: en-GB
+        timeZone:
+          type: string
+          nullable: true
+          example: Europe/Sarajevo
+
+    UserList:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        nextCursor:
+          type: string
+          nullable: true
+          example: usr_124
+
+    ChangePasswordRequest:
+      type: object
+      additionalProperties: false
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+          format: password
+          example: "P@ssw0rd!123"
+        newPassword:
+          type: string
+          format: password
+          minLength: 8
+          example: "N3wP@ssw0rd!456"
+
+    PasswordResetRequest:
+      type: object
+      additionalProperties: false
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          example: jane.doe@selvedin.com
+
+    PasswordResetConfirmRequest:
+      type: object
+      additionalProperties: false
+      required: [token, newPassword]
+      properties:
+        token:
+          type: string
+          description: Password reset token
+          example: prt_abc123
+        newPassword:
+          type: string
+          format: password
+          minLength: 8
+          example: "N3wP@ssw0rd!456"
+
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message, requestId]
+      properties:
+        code:
+          type: string
+          example: invalid_request
+        message:
+          type: string
+          example: Something went wrong.
+        requestId:
+          type: string
+          example: req_100
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true

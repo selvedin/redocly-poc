@@ -1,0 +1,88 @@
+openapi: 3.0.3
+info:
+  title: Sample Payments API
+  version: 1.0.0
+  description: >-
+    Simple sample API used to demonstrate custom OpenAPI rendering.
+servers:
+  - url: https://api.example.com
+paths:
+  /payments:
+    get:
+      summary: List payments
+      description: Returns a paginated list of payments.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          example: 20
+        - in: query
+          name: cursor
+          schema:
+            type: string
+          example: "abc123"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+    post:
+      summary: Create payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewPayment"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+  /payments/{id}:
+    get:
+      summary: Get payment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+components:
+  schemas:
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+    NewPayment:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+        note:
+          type: string
+
