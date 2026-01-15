@@ -8,3 +8,5 @@
   label: Payments API
 - page: openapi/users.yaml
   label: Users API
+- page: aws-cost-estimate.md
+  label: AWS Cost Estimate
