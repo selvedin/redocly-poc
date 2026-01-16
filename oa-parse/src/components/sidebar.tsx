@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Search from "@/components/search";
+import type { SearchDoc } from "@/lib/search";
 
 type OperationLink = {
   id: string;
@@ -16,7 +18,7 @@ type SpecNav = {
   groups: { title: string; items: OperationLink[] }[];
 };
 
-export function Sidebar({ specs, activeSpec, activeOp }: { specs: SpecNav[]; activeSpec?: string; activeOp?: string }) {
+export function Sidebar({ specs, activeSpec, activeOp, searchDocs }: { specs: SpecNav[]; activeSpec?: string; activeOp?: string; searchDocs: SearchDoc[] }) {
   const [openSpecs, setOpenSpecs] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
     specs.forEach((s) => {
@@ -48,6 +50,8 @@ export function Sidebar({ specs, activeSpec, activeOp }: { specs: SpecNav[]; act
   return (
     <aside className="hidden h-fit min-w-[240px] rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/60 lg:block">
       <div className="space-y-4 text-sm text-slate-700 dark:text-slate-300">
+        <Search docs={searchDocs} />
+        <div className="border-t border-slate-200 pt-4 dark:border-slate-800" />
         {specs.map((spec) => {
           const isOpen = openSpecs[spec.key] ?? false;
           return (
