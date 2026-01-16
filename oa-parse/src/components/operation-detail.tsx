@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Operation, Parameter } from "@/lib/openapi/load";
+import CodeSamples from "@/components/code-samples";
 
 function buildUrl(basePath: string, params: Record<string, string>, parameters: Parameter[]) {
   // Replace path params
@@ -36,6 +37,9 @@ export default function OperationDetail({ op }: { op: Operation }) {
 
   const url = useMemo(() => buildUrl(op.path, values, op.parameters), [op.path, values, op.parameters]);
 
+  // Simple heuristic body placeholder for non-GET methods
+  const body = op.method.toLowerCase() === "get" ? undefined : "{}";
+
   return (
     <div className="mt-4 space-y-3">
       {op.parameters.length ? (
@@ -65,7 +69,8 @@ export default function OperationDetail({ op }: { op: Operation }) {
       <div className="rounded-md border border-slate-200 bg-slate-50 p-3 font-mono text-xs text-slate-800 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-100">
         {url}
       </div>
+
+      <CodeSamples url={url} method={op.method} body={body} />
     </div>
   );
 }
-
