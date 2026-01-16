@@ -11,10 +11,10 @@ const languages: { key: Language; label: string }[] = [
   { key: "csharp", label: "C#" },
 ];
 
-export default function CodeSamples({ url, method, body }: { url: string; method: string; body?: string }) {
+export default function CodeSamples({ url, method, body, authToken }: { url: string; method: string; body?: string; authToken?: string }) {
   const [lang, setLang] = useState<Language>("curl");
 
-  const snippet = useMemo(() => generateSample(lang, { url, method, body }), [lang, url, method, body]);
+  const snippet = useMemo(() => generateSample(lang, { url, method, body, authToken }), [lang, url, method, body, authToken]);
 
   return (
     <div className="space-y-2">

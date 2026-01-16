@@ -48,6 +48,7 @@ export type Operation = {
   requestBodySchema?: any;
   requestBodyExample?: string;
   responses: ResponseInfo[];
+  servers?: string[];
 };
 
 function pickRequestExample(requestBody: any): any {
@@ -138,6 +139,7 @@ export function getOperations(spec: OpenAPIDocument, opts?: { specKey?: string }
   const operations: Operation[] = [];
   const servers = (spec.servers as any[]) ?? [];
   const baseUrl: string | undefined = servers[0]?.url;
+  const serverUrls = servers.map((s) => s.url).filter(Boolean);
   const specPrefix = opts?.specKey ? `${opts.specKey}-` : "";
   const components: Components = { schemas: (spec.components as any)?.schemas };
 
@@ -241,6 +243,7 @@ export function getOperations(spec: OpenAPIDocument, opts?: { specKey?: string }
         requestBodySchema,
         requestBodyExample,
         responses,
+        servers: serverUrls,
       });
     }
   }

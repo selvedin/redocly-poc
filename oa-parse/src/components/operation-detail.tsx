@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { Operation, Parameter } from "@/lib/openapi/load";
 import CodeSamples from "@/components/code-samples";
 import SchemaTree from "@/components/schema-tree";
 import ResponseView from "@/components/response-view";
+import TryItModal from "@/components/try-it-modal";
 
 function buildUrl(basePath: string, params: Record<string, string>, parameters: Parameter[]) {
   // Replace path params
@@ -37,8 +38,40 @@ function buildUrl(basePath: string, params: Record<string, string>, parameters: 
 export default function OperationDetail({ op }: { op: Operation }) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [expandAll, setExpandAll] = useState(false);
+  const [showTryIt, setShowTryIt] = useState(false);
+  const [authToken, setAuthToken] = useState<string>("");
+  const [showAuth, setShowAuth] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = window.localStorage.getItem("apiAuthToken");
+    if (saved) setAuthToken(saved);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (authToken) {
+      window.localStorage.setItem("apiAuthToken", authToken);
+    } else {
+      window.localStorage.removeItem("apiAuthToken");
+    }
+  }, [authToken]);
 
   const url = useMemo(() => buildUrl(op.path, values, op.parameters), [op.path, values, op.parameters]);
+
+  function generateDemoJwt() {
+    const header = { alg: "HS256", typ: "JWT" };
+    const now = Math.floor(Date.now() / 1000);
+    const payload = { sub: "demo-user", iat: now, exp: now + 3600 };
+    const base64url = (obj: any) =>
+      Buffer.from(JSON.stringify(obj))
+        .toString("base64")
+        .replace(/=/g, "")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_");
+    const unsigned = `${base64url(header)}.${base64url(payload)}`;
+    return `${unsigned}.demo-signature`;
+  }
 
   return (
     <div className="mt-4 space-y-3">
@@ -48,7 +81,45 @@ export default function OperationDetail({ op }: { op: Operation }) {
             <span key={t} className="rounded bg-slate-100 px-2 py-[2px] text-[11px] text-slate-700 dark:bg-slate-800 dark:text-slate-200">{t}</span>
           )) : null}
         </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowAuth((v) => !v)}
+            className="rounded border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+          >
+            Authorize
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowTryIt(true)}
+            className="rounded bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+          >
+            Try it
+          </button>
+        </div>
       </div>
+
+      {showAuth ? (
+        <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-100">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold">Authorization (Bearer)</span>
+            <button
+              type="button"
+              className="rounded border border-slate-300 px-2 py-1 text-[11px] dark:border-slate-700 dark:text-slate-100"
+              onClick={() => setAuthToken(generateDemoJwt())}
+            >
+              Generate demo token
+            </button>
+          </div>
+          <textarea
+            className="h-16 w-full rounded border border-slate-300 bg-white px-2 py-1 font-mono text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            placeholder="Paste or generate a JWT"
+            value={authToken}
+            onChange={(e) => setAuthToken(e.target.value)}
+          />
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">Applied to all Try it requests as Authorization: Bearer &lt;token&gt;</p>
+        </div>
+      ) : null}
 
       {op.parameters.length ? (
         <div className="grid gap-3 md:grid-cols-2">
@@ -127,11 +198,13 @@ export default function OperationDetail({ op }: { op: Operation }) {
           <div className="rounded-lg border border-slate-200 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-900/60 lg:max-h-[32rem] lg:overflow-auto lg:overflow-x-auto">
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Request samples</p>
             <div className="mt-2">
-              <CodeSamples url={url} method={op.method} body={op.requestBodySample} />
+              <CodeSamples url={url} method={op.method} body={op.requestBodySample} authToken={authToken} />
             </div>
           </div>
         </div>
       </div>
+
+      <TryItModal open={showTryIt} onClose={() => setShowTryIt(false)} operation={op} url={url} authToken={authToken} />
 
       <ResponseView responses={op.responses} expandAll={expandAll} />
     </div>
