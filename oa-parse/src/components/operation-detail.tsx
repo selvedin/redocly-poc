@@ -138,6 +138,15 @@ export default function OperationDetail({ op }: { op: Operation }) {
             if (p.required && value.trim() === "") error = "Required";
             if (!error && value && schema.type === "integer" && !/^[-]?\d+$/.test(value)) error = "Must be an integer";
             if (!error && value && schema.type === "number" && Number.isNaN(Number(value))) error = "Must be a number";
+            if (!error && value && schema.type === "boolean") {
+              const v = value.toLowerCase();
+              const allowed = ["true", "false", "1", "0", "yes", "no"];
+              if (!allowed.includes(v)) error = "Must be boolean (true/false/yes/no/1/0)";
+            }
+            if (!error && value && schema.format === "email") {
+              const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!emailRe.test(value)) error = "Must be a valid email";
+            }
             if (!error && value && schema.minLength !== undefined && value.length < schema.minLength) error = `Min length ${schema.minLength}`;
             if (!error && value && schema.maxLength !== undefined && value.length > schema.maxLength) error = `Max length ${schema.maxLength}`;
             if (!error && value && schema.minimum !== undefined && Number(value) < schema.minimum) error = `Min ${schema.minimum}`;
