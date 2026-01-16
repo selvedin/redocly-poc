@@ -1,12 +1,11 @@
 export const dynamic = "force-dynamic";
 
-import { Sidebar } from "@/components/sidebar";
-import { OperationCard } from "@/components/operation-card";
+import ClientShell from "@/components/client-shell";
 import { getOperationGroups, getOperations } from "@/lib/openapi/load";
 import { listSpecs } from "@/lib/openapi/specs";
 import { buildSearchDocs } from "@/lib/search";
 
-export default async function Home({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function Home() {
   const specs = await listSpecs();
   const specNav = specs.map((s) => ({
     key: s.key,
@@ -16,39 +15,20 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Re
 
   const specOps = specs.map((s) => ({ key: s.key, ops: getOperations(s.spec, { specKey: s.key }) }));
 
-  const params = (await searchParams) ?? {};
-  const specParam = typeof params.spec === "string" ? params.spec : undefined;
-  const opParam = typeof params.op === "string" ? params.op : undefined;
-  const activeKey = specParam ?? specs[0]?.key;
-  const activeSpec = specs.find((s) => s.key === activeKey);
-  const activeInfo = (activeSpec?.spec as any)?.info ?? {};
-  const activeOps = specOps.find((s) => s.key === activeKey)?.ops ?? [];
-  const operations = opParam ? activeOps.filter((o) => o.id === opParam) : [];
+  const specMeta = specs.map((s) => {
+    const info = (s.spec as any)?.info ?? {};
+    return { key: s.key, title: s.title, version: info.version, description: info.description };
+  });
+
   const searchDocs = specOps.flatMap((s) => buildSearchDocs(s.key, s.ops));
 
   return (
-    <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[260px_1fr]">
-      <Sidebar specs={specNav} activeSpec={activeKey} activeOp={opParam} searchDocs={searchDocs} />
-
-      <section className="rounded-xl border border-slate-200 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/60">
-        <div className="flex flex-col gap-2">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Version: {activeInfo?.version ?? "n/a"}</p>
-          <h1 className="text-3xl font-semibold text-slate-900 dark:text-slate-50">{activeSpec?.title ?? "OpenAPI Spec"}</h1>
-          {activeInfo?.description ? (
-            <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line">{activeInfo.description}</p>
-          ) : null}
-        </div>
-
-        {operations.length > 0 && (
-          <div className="mt-8 grid gap-4">
-            {operations.map((op) => (
-              <div key={op.id}>
-                <OperationCard op={op} />
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </div>
+    <ClientShell
+      specNav={specNav}
+      specMeta={specMeta}
+      specOps={specOps}
+      searchDocs={searchDocs}
+      defaultSpecKey={specs[0]?.key ?? ""}
+    />
   );
 }
