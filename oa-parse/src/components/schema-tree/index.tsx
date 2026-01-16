@@ -1,4 +1,4 @@
-import { useOpenState, useResolvedSchema } from "@/components/schema-tree/hooks";
+import { useOpenState, useResolvedSchema } from "@/hooks/use-resolved-schema";
 import type { NodeProps, Schema } from "@/components/schema-tree/types";
 import { NodeHeader } from "@/components/schema-tree/node-header";
 import { useMemo } from "react";
