@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Schema = any;
 
@@ -7,6 +7,8 @@ type NodeProps = {
   schema: Schema;
   required?: boolean;
   depth?: number;
+  expandAll?: boolean;
+  resolveRef?: (ref: string) => Schema | undefined;
 };
 
 function TypeBadge({ type }: { type?: string }) {
@@ -26,108 +28,147 @@ function Constraint({ label, value }: { label: string; value: string | number })
   );
 }
 
-function Node({ name, schema, required, depth = 0, expandAll = false }: NodeProps & { expandAll?: boolean }) {
-  const type = schema?.type as string | undefined;
-  const format = schema?.format as string | undefined;
-  const description = schema?.description as string | undefined;
-  const example = schema?.example;
-  const props = (schema?.properties as Record<string, any>) ?? {};
-  const req = Array.isArray(schema?.required) ? (schema?.required as string[]) : [];
+function EnumChips({ values }: { values: (string | number)[] }) {
+  if (!values?.length) return null;
+  return (
+    <div className="mt-1 flex flex-wrap gap-1 text-[11px]">
+      {values.map((v, i) => (
+        <span key={i} className="rounded bg-slate-100 px-2 py-[1px] text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+          {String(v)}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function Node({ name, schema, required, depth = 0, expandAll = false, resolveRef }: NodeProps) {
+  const resolvedSchema = useMemo(() => {
+    if (schema && schema.$ref && resolveRef) {
+      const refSchema = resolveRef(schema.$ref);
+      if (refSchema) return refSchema;
+    }
+    return schema;
+  }, [schema, resolveRef]);
+
+  const type = resolvedSchema?.type as string | undefined;
+  const format = resolvedSchema?.format as string | undefined;
+  const description = resolvedSchema?.description as string | undefined;
+  const example = resolvedSchema?.example;
+  const enums = resolvedSchema?.enum as (string | number)[] | undefined;
+  const props = (resolvedSchema?.properties as Record<string, any>) ?? {};
+  const req = Array.isArray(resolvedSchema?.required) ? (resolvedSchema?.required as string[]) : [];
   const constraints: (string | number)[] = [];
   const constraintLabels: string[] = [];
-  if (schema?.minimum !== undefined) {
-    constraints.push(schema.minimum);
+  if (resolvedSchema?.minimum !== undefined) {
+    constraints.push(resolvedSchema.minimum);
     constraintLabels.push("min");
   }
-  if (schema?.maximum !== undefined) {
-    constraints.push(schema.maximum);
+  if (resolvedSchema?.maximum !== undefined) {
+    constraints.push(resolvedSchema.maximum);
     constraintLabels.push("max");
   }
-  if (schema?.minLength !== undefined) {
-    constraints.push(schema.minLength);
+  if (resolvedSchema?.minLength !== undefined) {
+    constraints.push(resolvedSchema.minLength);
     constraintLabels.push("minLength");
   }
-  if (schema?.maxLength !== undefined) {
-    constraints.push(schema.maxLength);
+  if (resolvedSchema?.maxLength !== undefined) {
+    constraints.push(resolvedSchema.maxLength);
     constraintLabels.push("maxLength");
   }
-  const hasChildren = (type === "object" && Object.keys(props).length > 0) || (type === "array" && schema.items);
+  if (resolvedSchema?.pattern) {
+    constraints.push(resolvedSchema.pattern);
+    constraintLabels.push("pattern");
+  }
+
+  const hasChildren =
+    (type === "object" && Object.keys(props).length > 0) ||
+    (type === "array" && resolvedSchema.items) ||
+    resolvedSchema.oneOf ||
+    resolvedSchema.anyOf ||
+    resolvedSchema.allOf;
   const [open, setOpen] = useState<boolean>(Boolean(expandAll) || depth < 2);
   useEffect(() => {
     setOpen(Boolean(expandAll));
   }, [expandAll]);
 
   const renderChild = (childName: string, childSchema: any, key: string, reqFlag: boolean) => (
-    <div key={key}>
-      <Node name={childName} schema={childSchema} required={reqFlag} depth={depth + 1} expandAll={expandAll} />
+    <div key={key} className="relative pl-4">
+      <div className="absolute left-1 top-0 h-full border-l border-slate-700/50" />
+      <Node name={childName} schema={childSchema} required={reqFlag} depth={depth + 1} expandAll={expandAll} resolveRef={resolveRef} />
     </div>
   );
 
+  const arrayItemType = resolvedSchema?.items?.type as string | undefined;
+
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 rounded-md bg-[#0f1115] px-2 py-2 text-sm text-slate-200 shadow-sm ring-1 ring-slate-800/60">
       {name !== undefined && (
-        <div className="flex items-center text-sm">
+        <div className="flex items-start gap-2">
           {hasChildren ? (
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              className="mr-1 h-4 w-4 rounded border border-slate-300 text-[10px] leading-3 text-slate-600 dark:border-slate-700 dark:text-slate-200"
+              className="mt-[2px] flex h-5 w-5 items-center justify-center rounded-full border border-slate-600 text-[11px] text-slate-200 hover:border-slate-400 hover:text-slate-100"
+              aria-label={open ? "Collapse" : "Expand"}
             >
-              {open ? "-" : "+"}
+              {open ? "−" : "+"}
             </button>
           ) : (
-            <span className="mr-1 h-4 w-4" />
+            <span className="mt-[2px] h-5 w-5" />
           )}
-          <span className="font-mono text-xs text-slate-800 dark:text-slate-100">{name}</span>
-          <TypeBadge type={type} />
-          {format ? <Constraint label="fmt" value={format} /> : null}
-          {constraints.map((v, i) => (
-            <div key={`${name}-c-${i}`}>
-              <Constraint label={constraintLabels[i]} value={v} />
+          <div className="flex flex-col gap-1 flex-1">
+            <div className="flex flex-wrap items-center gap-2 leading-tight">
+              <span className="font-medium text-slate-200">{name}</span>
+              <TypeBadge type={type === "array" && arrayItemType ? `${type}<${arrayItemType}>` : type} />
+              {format ? <Constraint label="fmt" value={format} /> : null}
+              {constraints.map((v, i) => (
+                <div key={`${name}-c-${i}`}>
+                  <Constraint label={constraintLabels[i]} value={v} />
+                </div>
+              ))}
+              {required ? <span className="rounded bg-transparent text-[11px] font-semibold uppercase text-[#ef4444]">required</span> : null}
             </div>
-          ))}
-          {required ? <span className="ml-2 text-rose-600">*</span> : null}
+            {description ? <p className="text-xs text-slate-400">{description}</p> : null}
+            {example !== undefined ? (
+              <div className="text-xs text-slate-400">
+                Example: <code className="rounded bg-[#1f2933] px-2 py-[1px] font-mono text-slate-100">{String(example)}</code>
+              </div>
+            ) : null}
+            {enums ? <EnumChips values={enums} /> : null}
+          </div>
         </div>
       )}
-      {description ? (
-        <p className="text-xs text-slate-600 dark:text-slate-300">{description}</p>
-      ) : null}
-      {example !== undefined ? (
-        <div className="text-xs text-slate-600 dark:text-slate-300">
-          Example: <code className="bg-slate-100 px-1 py-[1px] dark:bg-slate-800">{String(example)}</code>
-        </div>
-      ) : null}
 
       {open && type === "object" && Object.keys(props).length > 0 ? (
-        <div className="ml-4 border-l border-dashed border-slate-300 pl-3 dark:border-slate-700">
+        <div className="mt-2 space-y-3">
           {Object.entries(props).map(([childName, childSchema]) => renderChild(childName, childSchema, `prop-${childName}`, req.includes(childName)))}
         </div>
       ) : null}
 
-      {open && type === "array" && schema.items ? (
-        <div className="ml-4 border-l border-dashed border-slate-300 pl-3 dark:border-slate-700">
-          <Node name={"[item]"} schema={schema.items} required depth={depth + 1} expandAll={expandAll} />
+      {open && type === "array" && resolvedSchema.items ? (
+        <div className="mt-2">
+          {renderChild("[item]", resolvedSchema.items, "array-item", true)}
         </div>
       ) : null}
 
-      {open && (schema.oneOf || schema.anyOf || schema.allOf) ? (
-        <div className="mt-2 space-y-1">
-          {schema.oneOf ? <div className="text-xs">oneOf:</div> : null}
-          {schema.oneOf ? (
-            <div className="ml-4 border-l border-dashed border-slate-300 pl-3 dark:border-slate-700">
-              {schema.oneOf.map((s: any, i: number) => renderChild(`option ${i + 1}`, s, `oneOf-${i}`, false))}
+      {open && (resolvedSchema.oneOf || resolvedSchema.anyOf || resolvedSchema.allOf) ? (
+        <div className="mt-3 space-y-2">
+          {resolvedSchema.oneOf ? <div className="text-xs uppercase tracking-wide text-slate-400">oneOf</div> : null}
+          {resolvedSchema.oneOf ? (
+            <div className="space-y-2">
+              {resolvedSchema.oneOf.map((s: any, i: number) => renderChild(`option ${i + 1}`, s, `oneOf-${i}`, false))}
             </div>
           ) : null}
-          {schema.anyOf ? <div className="text-xs">anyOf:</div> : null}
-          {schema.anyOf ? (
-            <div className="ml-4 border-l border-dashed border-slate-300 pl-3 dark:border-slate-700">
-              {schema.anyOf.map((s: any, i: number) => renderChild(`option ${i + 1}`, s, `anyOf-${i}`, false))}
+          {resolvedSchema.anyOf ? <div className="text-xs uppercase tracking-wide text-slate-400">anyOf</div> : null}
+          {resolvedSchema.anyOf ? (
+            <div className="space-y-2">
+              {resolvedSchema.anyOf.map((s: any, i: number) => renderChild(`option ${i + 1}`, s, `anyOf-${i}`, false))}
             </div>
           ) : null}
-          {schema.allOf ? <div className="text-xs">allOf:</div> : null}
-          {schema.allOf ? (
-            <div className="ml-4 border-l border-dashed border-slate-300 pl-3 dark:border-slate-700">
-              {schema.allOf.map((s: any, i: number) => renderChild(`option ${i + 1}`, s, `allOf-${i}`, false))}
+          {resolvedSchema.allOf ? <div className="text-xs uppercase tracking-wide text-slate-400">allOf</div> : null}
+          {resolvedSchema.allOf ? (
+            <div className="space-y-2">
+              {resolvedSchema.allOf.map((s: any, i: number) => renderChild(`option ${i + 1}`, s, `allOf-${i}`, false))}
             </div>
           ) : null}
         </div>
@@ -136,11 +177,11 @@ function Node({ name, schema, required, depth = 0, expandAll = false }: NodeProp
   );
 }
 
-export default function SchemaTree({ schema, expandAll = false }: { schema?: Schema; expandAll?: boolean }) {
+export default function SchemaTree({ schema, expandAll = false, resolveRef }: { schema?: Schema; expandAll?: boolean; resolveRef?: (ref: string) => Schema | undefined }) {
   if (!schema) return null;
   return (
-    <div className="rounded-md border border-slate-200 bg-white/80 p-3 text-sm dark:border-slate-800 dark:bg-slate-900/60">
-      <Node schema={schema} expandAll={expandAll} />
+    <div className="rounded-lg border border-slate-800 bg-[#0c0e12] p-4 text-sm text-slate-200 shadow-sm">
+      <Node schema={schema} expandAll={expandAll} resolveRef={resolveRef} />
     </div>
   );
 }

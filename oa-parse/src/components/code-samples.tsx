@@ -35,7 +35,7 @@ export default function CodeSamples({ url, method, body, authToken }: { url: str
           ))}
         </select>
       </div>
-      <pre className="max-h-96 rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-100 overflow-auto">
+      <pre className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-100 overflow-x-auto">
         {snippet}
       </pre>
     </div>

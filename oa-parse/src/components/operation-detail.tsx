@@ -73,6 +73,11 @@ export default function OperationDetail({ op }: { op: Operation }) {
     return `${unsigned}.demo-signature`;
   }
 
+  useEffect(() => {
+    // Default expand on first render for better visibility of request body fields.
+    setExpandAll(true);
+  }, []);
+
   return (
     <div className="mt-4 space-y-3">
       <div className="flex items-center justify-between">
@@ -195,7 +200,7 @@ export default function OperationDetail({ op }: { op: Operation }) {
         </div>
 
         <div className="space-y-3 min-w-0">
-          <div className="rounded-lg border border-slate-200 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-900/60 lg:max-h-[32rem] lg:overflow-auto lg:overflow-x-auto">
+          <div className="rounded-lg border border-slate-200 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-900/60 lg:overflow-x-auto">
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Request samples</p>
             <div className="mt-2">
               <CodeSamples url={url} method={op.method} body={op.requestBodySample} authToken={authToken} />
