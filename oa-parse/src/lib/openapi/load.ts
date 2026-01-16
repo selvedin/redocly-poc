@@ -20,6 +20,8 @@ export type Parameter = {
   in: "path" | "query" | "header" | "cookie";
   required?: boolean;
   example?: unknown;
+  schema?: any;
+  description?: string;
 };
 
 export type RequestBodySample = string | undefined;
@@ -156,6 +158,8 @@ export function getOperations(spec: OpenAPIDocument, opts?: { specKey?: string }
           in: p.in as Parameter["in"],
           required: Boolean(p.required),
           example: p.example,
+          schema: p.schema ? resolveSchema(p.schema, components, new Set()) : undefined,
+          description: p.description,
         }))
         .filter((p) => p.name && p.in);
 

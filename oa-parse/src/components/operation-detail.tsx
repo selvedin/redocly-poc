@@ -127,24 +127,53 @@ export default function OperationDetail({ op }: { op: Operation }) {
       ) : null}
 
       {op.parameters.length ? (
-        <div className="grid gap-3 md:grid-cols-2">
-          {op.parameters.map((p) => (
-            <label key={p.name} className="flex flex-col gap-1">
-              <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
-                {p.name}
-                <span className="ml-2 rounded bg-slate-100 px-1 py-[1px] text-[10px] uppercase text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                  {p.in}
-                </span>
-                {p.required ? <span className="ml-2 text-rose-600">*</span> : null}
-              </span>
-              <input
-                className="rounded-md border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-500"
-                placeholder={p.example !== undefined ? String(p.example) : undefined}
-                value={values[p.name] ?? ""}
-                onChange={(e) => setValues((prev) => ({ ...prev, [p.name]: e.target.value }))}
-              />
-            </label>
-          ))}
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          {op.parameters.map((p) => {
+            const schema = p.schema ?? {};
+            const typeLabel = schema.type ?? "any";
+            const range = [schema.minimum, schema.maximum].filter((v) => v !== undefined).join(" – ");
+
+            const value = values[p.name] ?? "";
+            let error: string | null = null;
+            if (p.required && value.trim() === "") error = "Required";
+            if (!error && value && schema.type === "integer" && !/^[-]?\d+$/.test(value)) error = "Must be an integer";
+            if (!error && value && schema.type === "number" && Number.isNaN(Number(value))) error = "Must be a number";
+            if (!error && value && schema.minLength !== undefined && value.length < schema.minLength) error = `Min length ${schema.minLength}`;
+            if (!error && value && schema.maxLength !== undefined && value.length > schema.maxLength) error = `Max length ${schema.maxLength}`;
+            if (!error && value && schema.minimum !== undefined && Number(value) < schema.minimum) error = `Min ${schema.minimum}`;
+            if (!error && value && schema.maximum !== undefined && Number(value) > schema.maximum) error = `Max ${schema.maximum}`;
+
+            return (
+              <label
+                key={p.name}
+                className="flex h-full flex-col justify-between gap-2 rounded-lg border border-slate-200 bg-white/70 p-3 dark:border-slate-800 dark:bg-slate-900/60"
+                style={{ minHeight: 140 }}
+              >
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                    {p.name}
+                    <span className="ml-2 rounded bg-slate-100 px-1 py-[1px] text-[10px] uppercase text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                      {p.in}
+                    </span>
+                    <span className="ml-2 text-[10px] uppercase text-slate-400">{typeLabel}</span>
+                    {p.required ? <span className="ml-2 text-rose-600">*</span> : null}
+                  </span>
+                  {p.description ? (
+                    <p className="line-clamp-2 text-[11px] text-slate-500 dark:text-slate-400">{p.description}</p>
+                  ) : null}
+                  {range ? <p className="text-[11px] text-slate-500 dark:text-slate-400">Range: {range}</p> : null}
+                </div>
+
+                <input
+                  className={`rounded-md border bg-white px-2 py-1 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-500 ${error ? "border-rose-400 focus-border-rose-500 dark:border-rose-500" : "border-slate-300"}`}
+                  placeholder={p.example !== undefined ? String(p.example) : undefined}
+                  value={value}
+                  onChange={(e) => setValues((prev) => ({ ...prev, [p.name]: e.target.value }))}
+                />
+                {error ? <p className="text-[11px] text-rose-500">{error}</p> : null}
+              </label>
+            );
+          })}
         </div>
       ) : (
         <p className="text-sm text-slate-500 dark:text-slate-400">No parameters.</p>
@@ -206,12 +235,16 @@ export default function OperationDetail({ op }: { op: Operation }) {
               <CodeSamples url={url} method={op.method} body={op.requestBodySample} authToken={authToken} />
             </div>
           </div>
+
+          {op.responses?.length ? (
+            <div className="rounded-lg border border-slate-200 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-900/60">
+              <ResponseView responses={op.responses} expandAll={expandAll} />
+            </div>
+          ) : null}
         </div>
       </div>
 
       <TryItModal open={showTryIt} onClose={() => setShowTryIt(false)} operation={op} url={url} authToken={authToken} />
-
-      <ResponseView responses={op.responses} expandAll={expandAll} />
     </div>
   );
 }

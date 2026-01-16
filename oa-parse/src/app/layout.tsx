@@ -31,24 +31,22 @@ export default function RootLayout({
             <div className="flex w-full items-center justify-between px-6 py-4">
               <div className="flex items-center gap-2">
                 <span className="rounded-md bg-slate-900 px-2 py-1 text-sm font-semibold text-white dark:bg-white dark:text-slate-900">
-                  OA
+                  PGX
                 </span>
                 <div>
-                  <p className="text-sm font-semibold">OpenAPI Docs</p>
+                  <p className="text-sm font-semibold">Payment's Gateway Accelerator</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Interactive spec renderer
+                    Interactive documentation
                   </p>
                 </div>
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                Step 1 · Layout & Theming
-              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-400"></div>
               <ThemeToggle />
             </div>
           </header>
           <main className="flex w-full flex-1 px-6 py-8">{children}</main>
           <footer className="border-t border-slate-200 bg-white/70 px-6 py-4 text-center text-xs text-slate-500 backdrop-blur dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-400">
-            Built for custom OpenAPI rendering
+            Payment's Gateway Accelerator
           </footer>
         </div>
       </body>

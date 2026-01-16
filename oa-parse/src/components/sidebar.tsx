@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 type OperationLink = {
@@ -13,44 +16,71 @@ type SpecNav = {
   groups: { title: string; items: OperationLink[] }[];
 };
 
-export function Sidebar({ specs, activeSpec }: { specs: SpecNav[]; activeSpec?: string }) {
+export function Sidebar({ specs, activeSpec, activeOp }: { specs: SpecNav[]; activeSpec?: string; activeOp?: string }) {
+  const [openSpecs, setOpenSpecs] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    specs.forEach((s) => {
+      init[s.key] = s.key === activeSpec; // open active by default
+    });
+    return init;
+  });
+
+  const toggle = (key: string) => setOpenSpecs((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  function methodClass(method: string) {
+    const m = method.toUpperCase();
+    switch (m) {
+      case "GET":
+        return "text-emerald-400";
+      case "POST":
+        return "text-blue-400";
+      case "PUT":
+        return "text-amber-400";
+      case "DELETE":
+        return "text-rose-400";
+      case "PATCH":
+        return "text-purple-400";
+      default:
+        return "text-slate-400";
+    }
+  }
+
   return (
     <aside className="hidden h-fit min-w-[240px] rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/60 lg:block">
-      <div className="mb-4 text-sm font-semibold text-slate-600 dark:text-slate-300">Navigation</div>
-      <div className="space-y-6 text-sm text-slate-700 dark:text-slate-300">
-        {specs.map((spec) => (
-          <div key={spec.key} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Link
-                href={{ pathname: "/", query: { spec: spec.key } }}
-                className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 hover:underline dark:text-slate-400"
+      <div className="space-y-4 text-sm text-slate-700 dark:text-slate-300">
+        {specs.map((spec) => {
+          const isOpen = openSpecs[spec.key] ?? false;
+          return (
+            <div key={spec.key} className="space-y-2">
+              <button
+                type="button"
+                onClick={() => toggle(spec.key)}
+                className="flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
               >
-                {spec.title}
-              </Link>
-              {activeSpec === spec.key ? (
-                <span className="rounded bg-slate-100 px-2 py-[2px] text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  Active
-                </span>
+                <span>{spec.title}</span>
+                <span className="text-lg leading-none">{isOpen ? "−" : "+"}</span>
+              </button>
+              {isOpen ? (
+                <div className="space-y-1">
+                  {spec.groups.flatMap((group) =>
+                    group.items.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={{ pathname: "/", query: { spec: spec.key, op: item.id } }}
+                        className={`flex items-center justify-between rounded-md px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-800 ${item.id === activeOp ? "bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" : ""}`}
+                      >
+                        <span className="truncate">{item.label}</span>
+                        <span className={`ml-2 shrink-0 text-[11px] font-bold uppercase ${methodClass(item.method)}`}>
+                          {item.method}
+                        </span>
+                      </Link>
+                    ))
+                  )}
+                </div>
               ) : null}
             </div>
-            <div className="space-y-1">
-              {spec.groups.flatMap((group) =>
-                group.items.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={{ pathname: "/", query: { spec: spec.key, op: item.id } }}
-                    className="flex items-center justify-between rounded-md px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-800"
-                  >
-                    <span className="truncate">{item.label}</span>
-                    <span className="ml-2 shrink-0 rounded-full bg-slate-900 px-2 py-[2px] text-[10px] font-semibold uppercase text-white dark:bg-white dark:text-slate-900">
-                      {item.method}
-                    </span>
-                  </Link>
-                ))
-              )}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </aside>
   );
