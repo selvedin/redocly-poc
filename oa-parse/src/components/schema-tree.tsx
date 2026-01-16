@@ -52,9 +52,9 @@ function Node({ name, schema, required, depth = 0, expandAll = false }: NodeProp
     constraintLabels.push("maxLength");
   }
   const hasChildren = (type === "object" && Object.keys(props).length > 0) || (type === "array" && schema.items);
-  const [open, setOpen] = useState(expandAll || depth < 2);
+  const [open, setOpen] = useState<boolean>(Boolean(expandAll) || depth < 2);
   useEffect(() => {
-    setOpen(expandAll);
+    setOpen(Boolean(expandAll));
   }, [expandAll]);
 
   const renderChild = (childName: string, childSchema: any, key: string, reqFlag: boolean) => (
@@ -82,7 +82,9 @@ function Node({ name, schema, required, depth = 0, expandAll = false }: NodeProp
           <TypeBadge type={type} />
           {format ? <Constraint label="fmt" value={format} /> : null}
           {constraints.map((v, i) => (
-            <Constraint key={`${name}-c-${i}`} label={constraintLabels[i]} value={v} />
+            <div key={`${name}-c-${i}`}>
+              <Constraint label={constraintLabels[i]} value={v} />
+            </div>
           ))}
           {required ? <span className="ml-2 text-rose-600">*</span> : null}
         </div>
