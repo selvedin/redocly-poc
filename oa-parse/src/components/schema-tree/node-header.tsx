@@ -1,6 +1,6 @@
 import { memo } from "react";
-import { ConstraintBadge, TypeBadge } from "@/components/schema-tree/badges";
-import { EnumChips } from "@/components/schema-tree/enum-chips";
+import { ConstraintBadge, TypeBadge } from "@/components/ui/badges";
+import { EnumChips } from "@/components/ui/enum-chips";
 
 export type ConstraintEntry = { label: string; value: string | number };
 

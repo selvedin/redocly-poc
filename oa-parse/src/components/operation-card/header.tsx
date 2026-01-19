@@ -1,6 +1,6 @@
 import { memo } from "react";
 import type { Operation } from "@/lib/openapi/load";
-import MethodPill from "@/components/operation-card/method-pill";
+import MethodPill from "@/components/ui/method-pill";
 
 function OperationHeaderBase({ op }: { op: Operation }) {
   return (

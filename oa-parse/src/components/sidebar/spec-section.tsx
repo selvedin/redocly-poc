@@ -1,7 +1,7 @@
 import { memo } from "react";
 import Link from "next/link";
 import Button from "@/components/ui/button";
-import { MethodBadge } from "@/components/sidebar/method-badge";
+import { MethodBadge } from "@/components/ui/method-badge";
 import type { SpecNav } from "@/components/sidebar/types";
 
 export type SpecSectionProps = {

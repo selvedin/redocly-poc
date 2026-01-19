@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Button from "@/components/ui/button";
 
 type Theme = "light" | "dark";
 
@@ -41,14 +42,15 @@ export default function ThemeToggle() {
   };
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="outline"
+      size="sm"
       onClick={toggle}
-      className="flex items-center gap-2 rounded-full border border-slate-300 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-200 dark:hover:bg-slate-700"
       aria-pressed={theme === "dark"}
+      className="flex items-center gap-2 rounded-full border border-slate-300 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-200 dark:hover:bg-slate-700"
     >
       <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-amber-300" />
       {theme === "dark" ? "Dark" : "Light"} mode
-    </button>
+    </Button>
   );
 }
