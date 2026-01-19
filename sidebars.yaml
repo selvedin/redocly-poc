@@ -1,9 +1,9 @@
 - page: index.md
   label: Home
-- page: about.md
-  label: About
-- page: code.md
-  label: Code example
+- page: tour.md
+  label: API Tour
+#- page: code.md
+#  label: Code example
 - page: openapi/payments.yaml
   label: Payments API
 - page: openapi/users.yaml

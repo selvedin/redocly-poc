@@ -3,3 +3,10 @@ extends:
 seo:
   title: Example Developer Portal
   description: Learn how to work with Example APIs
+breadcrumbs:
+  hide: false
+  prefixItems:
+    - page: index.md
+      label: Home
+      labelTranslationKey: home.title
+      icon: home

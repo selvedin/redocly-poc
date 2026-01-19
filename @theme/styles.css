@@ -16,6 +16,7 @@
   
   /* Spacing and borders */
   --border-color: #e5e7eb;
+  --md-content-max-width: 100%;
 }
 
 :root.light {
@@ -56,4 +57,10 @@
 :root {
   --font-family-headings: 'CustomBrand', system-ui, sans-serif;
   --font-family-body: 'Inter', system-ui, sans-serif;
+}
+
+/* Make the right panel use the full width of its column */
+.redoc-wrap .right-panel {
+  width: 100% !important;
+  max-width: 100% !important;
 }
