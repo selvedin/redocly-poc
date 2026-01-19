@@ -48,12 +48,12 @@ export default function OperationDetail({ op }: { op: Operation }) {
           })}
         </div>
       ) : (
-        <p className="text-sm text-slate-500 dark:text-slate-400">No parameters.</p>
+        <p className="text-sm text-[color:var(--muted-foreground)] dark:text-slate-400">No parameters.</p>
       )}
 
       <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
         <div className="space-y-3 min-w-0">
-          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 font-mono text-xs text-slate-800 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-100">
+          <div className="rounded-md border border-[color:var(--border)] bg-[color:var(--surface-muted)] p-3 font-mono text-xs text-[color:var(--foreground)] shadow-sm dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-100">
             {url}
           </div>
           <RequestBodyCard
@@ -71,7 +71,7 @@ export default function OperationDetail({ op }: { op: Operation }) {
         <div className="space-y-3 min-w-0">
           <RequestSamplesCard url={url} method={op.method} body={op.requestBodySample} authToken={authToken} />
           {op.responses?.length ? (
-            <div className="rounded-lg border border-slate-200 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-900/60">
+            <div className="rounded-lg border border-[color:var(--border)] bg-[color:var(--card)] p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
               <ResponseView responses={op.responses} expandAll={expandAll} />
             </div>
           ) : null}

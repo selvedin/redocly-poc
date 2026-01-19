@@ -7,7 +7,7 @@ function OperationCardBase({ op }: { op: Operation }) {
   return (
     <article
       id={op.id}
-      className="rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur transition hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-slate-700"
+      className="rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] p-4 shadow-sm backdrop-blur transition hover:border-[color:var(--border-strong)] dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-slate-700"
     >
       <OperationHeader op={op} />
       <OperationDetail op={op} />

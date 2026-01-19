@@ -28,7 +28,7 @@ export default function ClientShell({
     <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[260px_1fr]">
       <Sidebar specs={specNav} activeSpec={activeKey} activeOp={opParam ?? undefined} searchDocs={searchDocs} />
 
-      <section className="rounded-xl border border-slate-200 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/60">
+      <section className="rounded-xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-100">
         <SpecHeader meta={activeMeta} />
         <OperationList operations={operations} />
       </section>

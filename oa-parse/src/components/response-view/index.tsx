@@ -11,7 +11,7 @@ export default function ResponseView({ responses, expandAll = false }: { respons
   return (
     <div className="mt-6 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Responses</p>
+        <p className="text-sm font-semibold text-[color:var(--foreground)] dark:text-slate-100">Responses</p>
         <StatusTabs responses={responses} activeStatus={active?.status} onSelect={setActiveStatus} />
       </div>
 

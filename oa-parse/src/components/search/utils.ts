@@ -12,7 +12,7 @@ export function methodBadgeClass(method: string) {
     m === "put" && "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200",
     m === "delete" && "bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200",
     m === "patch" && "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200",
-    !["get", "post", "put", "delete", "patch"].includes(m) && "bg-slate-100 text-slate-800 dark:bg-slate-800/60 dark:text-slate-200"
+    !["get", "post", "put", "delete", "patch"].includes(m) && "bg-muted text-foreground dark:bg-slate-800/60 dark:text-slate-200"
   );
 }
 
@@ -32,4 +32,3 @@ export function navigateToResult(
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 100);
 }
-

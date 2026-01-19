@@ -19,13 +19,12 @@ const activeClasses: Record<Tone, string> = {
 };
 
 const idleClasses: Record<Tone, string> = {
-  green: `${base} border-green-200 bg-white text-green-700 hover:bg-green-50 dark:border-green-700 dark:bg-slate-900 dark:text-green-300 dark:hover:bg-slate-800`,
-  amber: `${base} border-amber-200 bg-white text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:bg-slate-900 dark:text-amber-300 dark:hover:bg-slate-800`,
-  red: `${base} border-rose-200 bg-white text-rose-700 hover:bg-rose-50 dark:border-rose-700 dark:bg-slate-900 dark:text-rose-300 dark:hover:bg-slate-800`,
-  blue: `${base} border-slate-300 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800`,
+  green: `${base} border-[color:var(--border)] bg-[color:var(--surface)] text-green-700 hover:bg-green-50 dark:border-green-700 dark:bg-slate-900 dark:text-green-300 dark:hover:bg-slate-800`,
+  amber: `${base} border-[color:var(--border)] bg-[color:var(--surface)] text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:bg-slate-900 dark:text-amber-300 dark:hover:bg-slate-800`,
+  red: `${base} border-[color:var(--border)] bg-[color:var(--surface)] text-rose-700 hover:bg-rose-50 dark:border-rose-700 dark:bg-slate-900 dark:text-rose-300 dark:hover:bg-slate-800`,
+  blue: `${base} border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] hover:bg-[color:var(--muted)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800`,
 };
 
 export function tabClasses(active: boolean, tone: Tone) {
   return active ? activeClasses[tone] : idleClasses[tone];
 }
-

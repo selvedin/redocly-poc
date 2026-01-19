@@ -17,12 +17,12 @@ function getInitialTheme(): Theme {
 
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
+  const body = document.body;
   root.dataset.theme = theme;
-  if (theme === "dark") {
-    root.classList.add("dark");
-  } else {
-    root.classList.remove("dark");
-  }
+  body.dataset.theme = theme;
+  const isDark = theme === "dark";
+  root.classList.toggle("dark", isDark);
+  body.classList.toggle("dark", isDark);
 }
 
 export default function ThemeToggle() {
@@ -47,7 +47,7 @@ export default function ThemeToggle() {
       size="sm"
       onClick={toggle}
       aria-pressed={theme === "dark"}
-      className="flex items-center gap-2 rounded-full border border-slate-300 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-200 dark:hover:bg-slate-700"
+      className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-foreground shadow-sm transition hover:bg-muted dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-200 dark:hover:bg-slate-700"
     >
       <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-amber-300" />
       {theme === "dark" ? "Dark" : "Light"} mode

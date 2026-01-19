@@ -16,7 +16,7 @@ function SpecSectionBase({ spec, isOpen, activeOp, onToggle }: SpecSectionProps)
     <div className="space-y-2">
       <Button
         variant="ghost"
-        className="flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+        className="flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground transition hover:bg-muted dark:text-slate-400 dark:hover:bg-slate-800"
         onClick={onToggle}
       >
         <span>{spec.title}</span>
@@ -29,9 +29,9 @@ function SpecSectionBase({ spec, isOpen, activeOp, onToggle }: SpecSectionProps)
               <Link
                 key={item.id}
                 href={{ pathname: "/", query: { spec: spec.key, op: item.id } }}
-                className={`flex items-center justify-between rounded-md px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-800 ${item.id === activeOp ? "bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" : ""}`}
+                className={`flex items-center justify-between rounded-md px-2 py-1 transition hover:bg-muted dark:hover:bg-slate-800 ${item.id === activeOp ? "bg-muted border border-border dark:bg-slate-800 dark:border-slate-700" : ""}`}
               >
-                <span className="truncate">{item.label}</span>
+                <span className="truncate text-foreground dark:text-slate-100">{item.label}</span>
                 <MethodBadge method={item.method} />
               </Link>
             ))

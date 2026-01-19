@@ -8,16 +8,19 @@ function OperationHeaderBase({ op }: { op: Operation }) {
       <MethodPill method={op.method} />
       <div className="flex-1">
         <div className="flex items-center justify-between gap-3">
-          <p className="font-mono text-sm text-slate-800 dark:text-slate-100">{op.path}</p>
-          <a href={`#${op.id}`} className="text-xs text-slate-500 underline-offset-4 hover:underline">
+          <p className="font-mono text-sm text-[color:var(--foreground)] dark:text-slate-100">{op.path}</p>
+          <a
+            href={`#${op.id}`}
+            className="text-xs text-[color:var(--muted-foreground)] underline-offset-4 hover:underline dark:text-slate-400"
+          >
             #
           </a>
         </div>
         {op.summary ? (
-          <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-50">{op.summary}</p>
+          <p className="mt-1 text-sm font-semibold text-[color:var(--foreground)] dark:text-slate-50">{op.summary}</p>
         ) : null}
         {op.description ? (
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-200">{op.description}</p>
+          <p className="mt-1 text-sm text-[color:var(--muted-foreground)] dark:text-slate-200">{op.description}</p>
         ) : null}
       </div>
     </div>

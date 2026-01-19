@@ -5,9 +5,11 @@ export type ButtonVariant = "primary" | "outline" | "ghost";
 export type ButtonSize = "xs" | "sm" | "md";
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-slate-900 text-white shadow hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200",
-  outline: "border border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800",
-  ghost: "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800",
+  primary:
+    "bg-[color:var(--foreground)] text-white shadow hover:brightness-95 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200",
+  outline:
+    "border border-[color:var(--border)] text-[color:var(--foreground)] hover:bg-[color:var(--muted)] dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800",
+  ghost: "text-[color:var(--foreground)] hover:bg-[color:var(--muted)] dark:text-slate-200 dark:hover:bg-slate-800",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

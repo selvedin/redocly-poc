@@ -12,7 +12,7 @@ export type ResponsePanelProps = {
 function ResponsePanelBase({ response, expandAll }: ResponsePanelProps) {
   if (!response) return null;
   return (
-    <div className="rounded-lg border border-slate-200 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-900/60">
+    <div className="rounded-lg border border-[color:var(--border)] bg-[color:var(--card)] p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
       <ResponseHeader status={response.status} contentType={response.contentType} description={response.description} />
       {response.schema ? (
         <div className="mt-2">
@@ -25,4 +25,3 @@ function ResponsePanelBase({ response, expandAll }: ResponsePanelProps) {
 }
 
 export const ResponsePanel = memo(ResponsePanelBase);
-

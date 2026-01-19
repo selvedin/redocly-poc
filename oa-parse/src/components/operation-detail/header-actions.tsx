@@ -8,9 +8,16 @@ export type HeaderActionsProps = {
 
 function HeaderActionsBase({ onToggleAuth, onTryIt }: HeaderActionsProps) {
   return (
-    <div className="flex items-center gap-2">
-      <Button variant="outline" size="sm" onClick={onToggleAuth} label="Authorize" />
-      <Button variant="primary" size="sm" onClick={onTryIt} label="Try it" />
+    <div className="flex items-center gap-2 text-xs text-[color:var(--muted-foreground)] dark:text-slate-400">
+      <button className="underline underline-offset-4" onClick={onToggleAuth}>
+        Auth
+      </button>
+      <span aria-hidden className="text-[color:var(--muted-foreground)] dark:text-slate-600">
+        |
+      </span>
+      <button className="underline underline-offset-4" onClick={onTryIt}>
+        Try it
+      </button>
     </div>
   );
 }

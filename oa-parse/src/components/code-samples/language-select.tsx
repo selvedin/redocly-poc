@@ -4,12 +4,12 @@ import type { Language } from "@/lib/codegen/templates";
 export default function LanguageSelect({ value, onChange }: { value: Language; onChange: (lang: Language) => void }) {
   return (
     <div className="flex items-center gap-2 text-xs">
-      <label className="text-slate-600 dark:text-slate-300" htmlFor="lang-select">
+      <label className="text-[color:var(--muted-foreground)] dark:text-slate-300" htmlFor="lang-select">
         Language
       </label>
       <select
         id="lang-select"
-        className="rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+        className="rounded border border-[color:var(--border)] bg-[color:var(--surface)] px-2 py-1 text-xs text-[color:var(--foreground)] shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
         value={value}
         onChange={(e) => onChange(e.target.value as Language)}
       >
@@ -22,4 +22,3 @@ export default function LanguageSelect({ value, onChange }: { value: Language; o
     </div>
   );
 }
-
