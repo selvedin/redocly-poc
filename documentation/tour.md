@@ -65,8 +65,8 @@ Check out this video for an overview of payment object roles and capabilities.
 
 To learn more about PGX’s payment integration options, see the following guides:
 
-- [Payment Links](index.md)
-- [Checkout](index.md)
-- [Subscriptions](index.md)
-- [Invoicing](index.md)
-- [Payment Intents](index.md)
+- [Payment Links](./index.md)
+- [Checkout](./index.md)
+- [Subscriptions](./index.md)
+- [Invoicing](./index.md)
+- [Payment Intents](./index.md)
