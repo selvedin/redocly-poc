@@ -14,7 +14,7 @@ navbar:
   items:
     - page: index.md
       label: Home
-    - page: documentation/index.md
+    - page: Documentation/index.md
       label: Getting Started
     - page: API Reference/payments.yaml
       label: API Reference
