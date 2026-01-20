@@ -37,7 +37,7 @@ Even low-code and no-code integrations produce these objects. So do actions you 
 
 PGX integrations handle complicated processes.
 
-The API uses a single object to track each process. You create the object at the start of the process, and after every step you can check its `status` to see what needs to happen next—This is sometimes referred to as a state machine.
+The API uses a single object to track each process. You create the object at the start of the process, and after every step you can check its `status` to see what needs to happen next—This is sometim es referred to as a state machine.
 
 For instance, while completing a payment, a customer might try several payment methods. If one payment method fails, a `status` of `r`equires_payment_method` lets you know to prompt the customer for another.
 
@@ -58,15 +58,15 @@ Check out this video for an overview of payment object roles and capabilities.
 {% cards %}
 {% card title="" variant="outlined" align="center" %}
 
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=GUurzvS3DlY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/GUurzvS3DlY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 {% /card %}
 {% /cards %}
 
 To learn more about PGX’s payment integration options, see the following guides:
 
-- [Payment Links](./index.md)
-- [Checkout](./index.md)
-- [Subscriptions](./index.md)
-- [Invoicing](./index.md)
-- [Payment Intents](./index.md)
+- [Payment Links](index.md)
+- [Checkout](index.md)
+- [Subscriptions](index.md)
+- [Invoicing](index.md)
+- [Payment Intents](index.md)

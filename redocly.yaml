@@ -10,3 +10,14 @@ breadcrumbs:
       label: Home
       labelTranslationKey: home.title
       icon: home
+navbar:
+  items:
+    - page: index.md
+      label: Home
+    - page: documentation/index.md
+      label: Getting Started
+    - page: API Reference/payments.yaml
+      label: API Reference
+    - label: Support
+      href: https://pgx.endava.com
+      external: true

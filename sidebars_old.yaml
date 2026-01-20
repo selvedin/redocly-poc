@@ -2,8 +2,8 @@
   label: Home
 - page: tour.md
   label: API Tour
-#- page: code.md
-#  label: Code example
+- page: code.md
+  label: Code example
 - page: openapi/payments.yaml
   label: Payments API
 - page: openapi/users.yaml
