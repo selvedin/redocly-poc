@@ -30,8 +30,8 @@ This document outlines the proposed epics, user stories, and effort estimates fo
 
 | Estimate Type | Effort (Days) |
 |--------------|---------------|
-| Original     | 10            |
-| With AI Tool | **6**         |
+| Original     | 9             |
+| With AI Tool | **5**         |
 
 **Notes:**  
 Copilot accelerates boilerplate and typing, but OpenAPI semantics and edge cases still require manual reasoning.
@@ -48,9 +48,9 @@ Copilot accelerates boilerplate and typing, but OpenAPI semantics and edge cases
 - Client-side search (operations & schemas)
 
 | Estimate Type | Effort (Days) |
-|--------------|---------------|
-| Original     | 10            |
-| With AI Tool | **4–5**       |
+|--------------|-------------|
+| Original     | 8           |
+| With AI Tool | **4**       |
 
 **Notes:**  
 High productivity gains due to Copilot generating React components and layout scaffolding.
@@ -67,8 +67,8 @@ High productivity gains due to Copilot generating React components and layout sc
 
 | Estimate Type | Effort (Days) |
 |--------------|---------------|
-| Original     | 7             |
-| With AI Tool | **4**         |
+| Original     | 6             |
+| With AI Tool | **3**         |
 
 **Notes:**  
 AI speeds up UI and form generation, but security logic must be reviewed carefully.
@@ -85,8 +85,8 @@ AI speeds up UI and form generation, but security logic must be reviewed careful
 
 | Estimate Type | Effort (Days) |
 |--------------|---------------|
-| Original     | 5             |
-| With AI Tool | **2–3**       |
+| Original     | 4             |
+| With AI Tool | **2**         |
 
 **Notes:**  
 Well-defined data model; Copilot performs strongly here.
@@ -105,8 +105,8 @@ Well-defined data model; Copilot performs strongly here.
 
 | Estimate Type | Effort (Days) |
 |--------------|---------------|
-| Original     | 13            |
-| With AI Tool | **7–8**       |
+| Original     | 10            |
+| With AI Tool | **5**         |
 
 **Notes:**  
 Proxy setup and correctness checks dominate this epic; AI mainly helps with scaffolding.
@@ -124,9 +124,9 @@ Proxy setup and correctness checks dominate this epic; AI mainly helps with scaf
 - Extensible snippet architecture
 
 | Estimate Type | Effort (Days) |
-|--------------|---------------|
-| Original     | 4             |
-| With AI Tool | **1–2**       |
+|--------------|--------------|
+| Original     | 4            |
+| With AI Tool | **2**        |
 
 **Notes:**  
 Copilot significantly accelerates snippet template generation.
@@ -143,7 +143,7 @@ Copilot significantly accelerates snippet template generation.
 
 | Estimate Type | Effort (Days) |
 |--------------|---------------|
-| Original     | 4             |
+| Original     | 5             |
 | With AI Tool | **3**         |
 
 **Notes:**  
@@ -160,9 +160,9 @@ Mostly configuration and routing; limited complexity.
 - Performance optimizations for large specs
 
 | Estimate Type | Effort (Days) |
-|--------------|---------------|
-| Original     | 10            |
-| With AI Tool | **5–6**       |
+|--------------|-------------|
+| Original     | 10          |
+| With AI Tool | **5**       |
 
 **Notes:**  
 This work is largely non-automatable; AI offers minimal reduction.
@@ -171,16 +171,65 @@ This work is largely non-automatable; AI offers minimal reduction.
 
 ## Overall Summary
 
-| Metric                | Value           |
-|-----------------------|-----------------|
-| Original total effort | ~57 days        |
-| With AI Help          | **~32–37 days** |
-| Team size             | 3 developers    |
-| Calendar duration     | **~4–5 weeks**  |
+| Metric                | Value          |
+|-----------------------|----------------|
+| Original total effort | ~56 days       |
+| With AI Help          | **~29 days**   |
+| Team size             | 3 developers   |
+| Calendar duration     | **~5-6 weeks** |
 
 ---
 
+#### Why not less than 5 weeks?
+
+- 2 devs are new to React/Node
+- Integration + correctness work cannot be parallelized fully
+- Bugs appear after everything looks done
+
+### Build vs Redocly – manager-friendly comparison
+
+{% table %}
+* Solution
+* Pros
+* Cons
+---
+* Build (this proposal)
+* Full control (branding, auth, proxy, internal APIs)
+* ~2–2.5 months initial investment
+---
+* Build (this proposal)
+* No per-API or per-seat licensing
+* Ongoing maintenance (≈10–20% dev time)
+---
+* Build (this proposal)
+* Can evolve into internal platform
+* Advanced features (OAuth flows, diffing) are extra
+---
+* Redocly subscription
+* Instant maturity
+* Recurring cost
+---
+* Redocly subscription
+* OAuth flows, diffing, search, hosting solved
+* Limited customization
+---
+* Redocly subscription
+* Support & updates
+* Vendor lock-in
+---
+* Redocly subscription
+* 
+* Proxy & auth flows may not fit internal needs
+{% /table %}
+
+
 ## Conclusion
-Using GitHub Copilot (Agentic) and early prototyping progress reduces delivery time by approximately **25–30%**. The proposed MVP is realistically achievable within **4–5 weeks** while maintaining correctness, maintainability, and extensibility.
+
+Early prototyping with GitHub Copilot shows very strong productivity.
+
+Based on current progress, we expect Copilot to reduce delivery time by ~35–40%.
+
+The proposed MVP is realistically achievable within **5–6 weeks** while maintaining correctness, maintainability, and extensibility.
 
 This provides a strong internal alternative to a Redocly subscription, with the trade-off of ongoing maintenance and delayed access to advanced features such as OAuth flows and spec diffing.
+
