@@ -20,9 +20,9 @@ The goal is to support an informed **build vs buy** decision.
 
 ## High-level comparison
 
-{% callout type="info" %}
+{% admonition type="info" %}
 This comparison focuses on **OpenAPI 3.0.1**, **versioned documentation**, **static business content**, and **SSO/RBAC** support.
-{% /callout %}
+{% /admonition %}
 
 | Dimension | Self-build (In-House)  | Redocly Subscription |
 |--------|------------------------|----------------------|
@@ -39,13 +39,13 @@ This comparison focuses on **OpenAPI 3.0.1**, **versioned documentation**, **sta
 
 ### Pros
 
-{% callout type="success" %}
+{% admonition type="success" %}
 **Strengths of the self-built approach**
-{% /callout %}
+{% /admonition %}
 
 - **Full customization**
     - Unified experience for OpenAPI reference and business flows
-    - Custom Markdoc components (steps, callouts, diagrams, tabs)
+    - Custom Markdoc components (steps, admonitions, diagrams, tabs)
     - Portal UX aligned with internal standards and branding
 
 - **Tight integration**
@@ -71,9 +71,9 @@ This comparison focuses on **OpenAPI 3.0.1**, **versioned documentation**, **sta
 
 ### Cons
 
-{% callout type="warning" %}
+{% admonition type="warning" %}
 **Trade-offs and risks of the self-built approach**
-{% /callout %}
+{% /admonition %}
 
 - **Upfront delivery effort**
     - ~10–12 weeks with a 3-developer team (2 ramping on React/Node)
@@ -99,9 +99,9 @@ This comparison focuses on **OpenAPI 3.0.1**, **versioned documentation**, **sta
 
 ### Pros
 
-{% callout type="success" %}
+{% admonition type="success" %}
 **Strengths of Redocly**
-{% /callout %}
+{% /admonition %}
 
 - **Immediate availability**
     - Production-grade OpenAPI rendering out of the box
@@ -124,9 +124,9 @@ This comparison focuses on **OpenAPI 3.0.1**, **versioned documentation**, **sta
 
 ### Cons
 
-{% callout type="warning" %}
+{% admonition type="warning" %}
 **Limitations of Redocly**
-{% /callout %}
+{% /admonition %}
 
 - **Recurring subscription cost**
     - Enterprise features required for SSO/RBAC
@@ -148,9 +148,9 @@ This comparison focuses on **OpenAPI 3.0.1**, **versioned documentation**, **sta
 
 ## When self-build is the better choice
 
-{% callout type="info" %}
+{% admonition type="info" %}
 Self-build is recommended when most of the following apply:
-{% /callout %}
+{% /admonition %}
 
 - Strong need for **business flow documentation** alongside APIs
 - Requirement for **fine-grained RBAC** and internal-only content
@@ -162,9 +162,9 @@ Self-build is recommended when most of the following apply:
 
 ## When Redocly is the better choice
 
-{% callout type="info" %}
+{% admonition type="info" %}
 Redocly is recommended when:
-{% /callout %}
+{% /admonition %}
 
 - Time-to-market is the top priority
 - Documentation scope is primarily OpenAPI reference
@@ -176,9 +176,9 @@ Redocly is recommended when:
 
 ## Summary
 
-{% callout type="success" %}
+{% admonition type="success" %}
 **Decision framing**
-{% /callout %}
+{% /admonition %}
 
 - **Self-build** offers maximum flexibility, ownership, and long-term cost efficiency at the expense of upfront effort and ongoing maintenance.
 - **Redocly** provides immediate value and reduced operational burden but introduces recurring costs and customization limits.
