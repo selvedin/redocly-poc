@@ -199,4 +199,4 @@ Critical for internal/private documentation compliance.
 | Original total | ~74 days     |
 | With AI tooling | **~46 days** |
 | Team size | 3 developers |
-| Calendar time | **~7–**      
+| Calendar time | **~7 weeks**      
