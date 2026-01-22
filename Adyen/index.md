@@ -1,0 +1,68 @@
+# Adyen Index
+
+- API Explorer
+  - API Explorer
+- Developer Resources
+  - Customer Area
+    - Live Customer Area
+    - Live Balance Platform
+    - TEST Customer Area
+    - Test Balance Platform
+  - Developer Tools
+    - API Explorer
+    - Checkout Create
+    - Documentation
+    - GitHub Samples
+    - Postman Workspace
+    - Supported Payments Methods
+    - Tech Newsletters
+    - Test Cards
+  - Implementation Examples
+    - Advanced Online Payments
+    - Adyen for Platforms
+    - Authorization Adjustment
+    - Gift Cards
+    - In Person Payments Loyalty
+    - Online Payments
+    - Pay By Link
+    - Plugins
+    - Recuring Payments
+  - Knowledge Base
+    - Devs On Twiter
+    - Devs On Youtube
+    - Help
+    - Stackoverflow
+  - Index
+- Documentation
+  - Adyen for Platforms
+    - Classic Platforms
+    - Financial Products
+    - Get Started
+    - Marketplaces
+    - Platforms
+  - Common
+    - Discover Our Developer Resources
+      - Api Diff Tool
+      - Api Explorer
+      - Example Integration
+      - Server Side Libs
+      - Testing Tools
+    - Join Our Dev Community
+      - Dev News
+      - Devs
+      - Github Repo
+      - Poctman Collections
+      - Stack Overflow
+      - Tech Blog
+  - In-Person Payments
+    - Get Started
+    - Payment Terminals
+    - Release Notes
+    - Tap To Pay
+    - Terminal Api
+  - Online Payments
+    - Accept Payments
+    - Add Payments Method
+    - Get Started
+    - Release Notes
+    - Webhooks

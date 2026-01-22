@@ -1,0 +1,5 @@
+# Plugins
+
+- Magento
+- Shopware
+- Salesforce
